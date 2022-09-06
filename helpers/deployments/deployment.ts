@@ -118,5 +118,6 @@ export const upgradeContract = async <T extends Contract>(
 
 export default {
   deployNewContract,
+  deployNewContractWithLib,
   upgradeContract,
 };
