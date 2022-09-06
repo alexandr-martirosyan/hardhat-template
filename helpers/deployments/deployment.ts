@@ -10,7 +10,7 @@ export async function deployNewContract<T extends Contract>(
   upgradeType: UpgradeType,
   ...constructorArgs: any[]
 ): Promise<T> {
-  return _deployNetContract<T>(contractName, upgradeType, undefined, constructorArgs);
+  return _deployNetContract<T>(contractName, upgradeType, undefined, ...constructorArgs);
 }
 
 export async function deployNewContractWithLib<T extends Contract>(
@@ -19,7 +19,7 @@ export async function deployNewContractWithLib<T extends Contract>(
   libraries: Record<string, string>,
   ...constructorArgs: any[]
 ): Promise<T> {
-  return _deployNetContract<T>(contractName, upgradeType, libraries, constructorArgs);
+  return _deployNetContract<T>(contractName, upgradeType, libraries, ...constructorArgs);
 }
 
 const _deployNetContract = async <T extends Contract>(
