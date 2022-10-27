@@ -6,7 +6,6 @@ const main = async () => {
   const token = await deployNewContract<SimpleERC20>(
     "SimpleERC20",
     UpgradeType.NON_UPGRADEABLE,
-    undefined,
     []
   );
 
