@@ -8,9 +8,26 @@ import { getInfos, saveInfos } from "./infos";
 export async function deployNewContract<T extends Contract>(
   contractName: string,
   upgradeType: UpgradeType,
-  libraries?: Record<string, string>,
   ...constructorArgs: any[]
 ): Promise<T> {
+  return _deployNetContract<T>(contractName, upgradeType, undefined, ...constructorArgs);
+}
+
+export async function deployNewContractWithLib<T extends Contract>(
+  contractName: string,
+  upgradeType: UpgradeType,
+  libraries: Record<string, string>,
+  ...constructorArgs: any[]
+): Promise<T> {
+  return _deployNetContract<T>(contractName, upgradeType, libraries, ...constructorArgs);
+}
+
+const _deployNetContract = async <T extends Contract>(
+  contractName: string,
+  upgradeType: UpgradeType,
+  libraries?: Record<string, string>,
+  ...constructorArgs: any[]
+) => {
   const Factory = await ethers.getContractFactory(contractName, { libraries });
   let contract: T;
   const contractInfo: IContractInfo = {
@@ -45,15 +62,15 @@ export async function deployNewContract<T extends Contract>(
   infos.push(contractInfo);
   saveInfos(infos);
   return contract;
-}
+};
 
-export async function upgradeContract<T extends Contract>(
+export const upgradeContract = async <T extends Contract>(
   contractName: string,
   contractAddress: string,
   upgradeType: UpgradeType,
   useOpenzeppelin: boolean,
   libraries?: Record<string, string>
-): Promise<T> {
+): Promise<T> => {
   const Factory = await ethers.getContractFactory(contractName, { libraries });
   let contract: T;
   const contractInfo: IContractInfo = {
@@ -97,9 +114,10 @@ export async function upgradeContract<T extends Contract>(
   infos.push(contractInfo);
   saveInfos(infos);
   return contract;
-}
+};
 
 export default {
   deployNewContract,
+  deployNewContractWithLib,
   upgradeContract,
 };
