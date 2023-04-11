@@ -33,17 +33,26 @@ export const verifyDeployedContracts = async () => {
 
 export const saveDeployedAddresses = () => {
   const addresses: Record<string, object> = {};
+  const contractNames: Record<string, number> = {};
   const infos = getInfos();
   for (const contract of infos) {
+    let contractName: string;
+    if (contractNames[contract.name] === undefined) {
+      contractNames[contract.name] = 1;
+      contractName = contract.name;
+    } else {
+      contractNames[contract.name]++;
+      contractName = contract.name + `__${contractNames[contract.name]}`;
+    }
     switch (contract.upgradeType) {
       case UpgradeType.NON_UPGRADEABLE:
-        addresses[contract.name] = {
+        addresses[contractName] = {
           upgradeType: contract.upgradeType,
           address: contract.address,
         };
         break;
       case UpgradeType.TRANSPARENT:
-        addresses[contract.name] = {
+        addresses[contractName] = {
           upgradeType: contract.upgradeType,
           address: contract.address,
           implementation: contract.upgradeInfo?.implementation,
