@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
     "declaration": true,
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true
   },
   "include": [

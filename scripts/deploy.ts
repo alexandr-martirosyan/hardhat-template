@@ -12,8 +12,8 @@ const main = async () => {
     unlockTime
   );
   const addresses = {
-    lock: lock.address,
-    lockUp: lockUp.address,
+    lock: await lock.getAddress(),
+    lockUp: await lockUp.getAddress(),
   };
 
   saveAddresses(addresses);

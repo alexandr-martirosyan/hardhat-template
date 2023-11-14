@@ -1,5 +1,4 @@
 import fs from "fs";
-import { BigNumber } from "ethers";
 import hre, { ethers, network } from "hardhat";
 
 import configs from "../configs/configs.json";
@@ -120,28 +119,28 @@ export const setTimestamp = async (seconds: number) => {
   await network.provider.send("evm_mine");
 };
 
-export const getTimestamp = async (): Promise<number> => {
+export const getTimestamp = async (): Promise<bigint> => {
   const blockNumber = await ethers.provider.getBlockNumber();
   const block = await ethers.provider.getBlock(blockNumber);
-  return block.timestamp;
+  return block ? BigInt(block.timestamp) : -1n;
 };
 
-export const daysToSeconds = (days: BigNumber): BigNumber => {
-  return hoursToSeconds(days.mul(24));
+export const daysToSeconds = (days: bigint): bigint => {
+  return hoursToSeconds(days * 24n);
 };
 
-export const hoursToSeconds = (hours: BigNumber): BigNumber => {
-  return minutesToSeconds(hours.mul(60));
+export const hoursToSeconds = (hours: bigint): bigint => {
+  return minutesToSeconds(hours * 60n);
 };
 
-export const minutesToSeconds = (minutes: BigNumber): BigNumber => {
-  return minutes.mul(60);
+export const minutesToSeconds = (minutes: bigint): bigint => {
+  return minutes * 60n;
 };
 
-export const getNextTimestampDivisibleBy = async (num: number): Promise<BigNumber> => {
+export const getNextTimestampDivisibleBy = async (num: bigint): Promise<bigint> => {
   const blockTimestamp = await getTimestamp();
-  const numCount = BigNumber.from(blockTimestamp).div(num);
-  return numCount.add(1).mul(num);
+  const numCount = blockTimestamp / num;
+  return numCount + 1n * num;
 };
 
 export default {

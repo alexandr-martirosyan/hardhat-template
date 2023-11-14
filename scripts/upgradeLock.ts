@@ -13,7 +13,7 @@ const main = async () => {
     true, // can be false too
     undefined
   );
-  console.log("SuccessFully upgraded the address", lockV2.address);
+  console.log("SuccessFully upgraded the address", await lockV2.getAddress());
 };
 
 main();

@@ -1,28 +1,28 @@
-import { Contract } from "ethers";
+import { BaseContract } from "ethers";
 import { ethers, upgrades } from "hardhat";
 
 import { UpgradeType } from "./upgradeType";
 import { IContractInfo } from "./contractInfo";
 import { getInfos, saveInfos } from "./infos";
 
-export async function deployNewContract<T extends Contract>(
+export async function deployNewContract<T extends BaseContract>(
   contractName: string,
   upgradeType: UpgradeType,
   ...constructorArgs: any[]
 ): Promise<T> {
-  return _deployNetContract<T>(contractName, upgradeType, undefined, ...constructorArgs);
+  return _deployNewContract<T>(contractName, upgradeType, undefined, ...constructorArgs);
 }
 
-export async function deployNewContractWithLib<T extends Contract>(
+export async function deployNewContractWithLib<T extends BaseContract>(
   contractName: string,
   upgradeType: UpgradeType,
   libraries: Record<string, string>,
   ...constructorArgs: any[]
 ): Promise<T> {
-  return _deployNetContract<T>(contractName, upgradeType, libraries, ...constructorArgs);
+  return _deployNewContract<T>(contractName, upgradeType, libraries, ...constructorArgs);
 }
 
-const _deployNetContract = async <T extends Contract>(
+const _deployNewContract = async <T extends BaseContract>(
   contractName: string,
   upgradeType: UpgradeType,
   libraries?: Record<string, string>,
@@ -37,20 +37,21 @@ const _deployNetContract = async <T extends Contract>(
     upgradeType,
     upgradeInfo: undefined,
   };
+
   switch (upgradeType) {
     case UpgradeType.NON_UPGRADEABLE:
       contract = (await Factory.deploy(...constructorArgs)) as T;
-      await contract.deployed();
-      contractInfo.address = contract.address;
+      await contract.waitForDeployment();
+      contractInfo.address = await contract.getAddress();
       contractInfo.constructorArgs = constructorArgs;
       break;
     case UpgradeType.TRANSPARENT:
-      contract = (await upgrades.deployProxy(Factory, constructorArgs)) as T;
-      await contract.deployed();
-      contractInfo.address = contract.address;
+      contract = (await upgrades.deployProxy(Factory, constructorArgs)) as BaseContract as T;
+      await contract.waitForDeployment();
+      contractInfo.address = await contract.getAddress();
       contractInfo.upgradeInfo = {
-        proxyAdmin: await upgrades.erc1967.getAdminAddress(contract.address),
-        implementation: await upgrades.erc1967.getImplementationAddress(contract.address),
+        proxyAdmin: await upgrades.erc1967.getAdminAddress(contractInfo.address),
+        implementation: await upgrades.erc1967.getImplementationAddress(contractInfo.address),
       };
       break;
     case UpgradeType.UUPS:
@@ -64,7 +65,7 @@ const _deployNetContract = async <T extends Contract>(
   return contract;
 };
 
-export const upgradeContract = async <T extends Contract>(
+export const upgradeContract = async <T extends BaseContract>(
   contractName: string,
   contractAddress: string,
   upgradeType: UpgradeType,
@@ -83,22 +84,22 @@ export const upgradeContract = async <T extends Contract>(
   switch (upgradeType) {
     case UpgradeType.TRANSPARENT:
       if (useOpenzeppelin) {
-        contract = (await upgrades.upgradeProxy(contractAddress, Factory)) as T;
-        await contract.deployed();
+        contract = (await upgrades.upgradeProxy(contractAddress, Factory)) as BaseContract as T;
+        await contract.waitForDeployment();
         contractInfo.upgradeInfo = {
-          proxyAdmin: await upgrades.erc1967.getAdminAddress(contract.address),
-          implementation: await upgrades.erc1967.getImplementationAddress(contract.address),
+          proxyAdmin: await upgrades.erc1967.getAdminAddress(contractAddress),
+          implementation: await upgrades.erc1967.getImplementationAddress(contractAddress),
         };
       } else {
         const proxyAdminAddr = await upgrades.erc1967.getAdminAddress(contractAddress);
         const proxyAdmin = await ethers.getContractAt("ProxyAdmin", proxyAdminAddr);
         const newImpl = await Factory.deploy();
-        await newImpl.deployed();
-        await proxyAdmin.upgrade(contractAddress, newImpl.address);
-        contract = (await ethers.getContractAt(contractName, contractAddress)) as T;
+        await newImpl.waitForDeployment();
+        await proxyAdmin.upgrade(contractAddress, await newImpl.getAddress());
+        contract = (await ethers.getContractAt(contractName, contractAddress)) as BaseContract as T;
         contractInfo.upgradeInfo = {
-          proxyAdmin: await upgrades.erc1967.getAdminAddress(contract.address),
-          implementation: await upgrades.erc1967.getImplementationAddress(contract.address),
+          proxyAdmin: await upgrades.erc1967.getAdminAddress(contractAddress),
+          implementation: await upgrades.erc1967.getImplementationAddress(contractAddress),
         };
       }
       break;
