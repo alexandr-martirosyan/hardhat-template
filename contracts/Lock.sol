@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.19;
 
 // Import this file to use console.log
+// solhint-disable-next-line no-global-import, no-console
 import "hardhat/console.sol";
+
+// solhint-disable custom-errors
 
 contract Lock {
   uint256 public unlockTime;

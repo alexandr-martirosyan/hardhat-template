@@ -3,8 +3,12 @@
 
 pragma solidity ^0.8.0;
 
+// solhint-disable-next-line no-global-import
 import "./TransparentUpgradeableProxy.sol";
+// solhint-disable-next-line no-global-import
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+// solhint-disable custom-errors
 
 /**
  * @dev This is an auxiliary contract meant to be assigned as the admin of a {TransparentUpgradeableProxy}. For an

@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.19;
 
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 // Import this file to use console.log
+// solhint-disable-next-line no-global-import, no-console
 import "hardhat/console.sol";
+
+// solhint-disable custom-errors
 
 contract LockUpgradeable is Initializable {
   uint256 public unlockTime;

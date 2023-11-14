@@ -9,6 +9,7 @@
     "coverage": "hardhat coverage",
     "eslint-check": "eslint '**/*.{js,ts}'",
     "solhint-check": "solhint 'contracts/**/*.sol'",
+    "check-all": "yarn prettier-check; yarn eslint-check; yarn solhint-check",
     "hardhat": "hardhat",
     "size-contracts": "hardhat compile && hardhat size-contracts",
     "test": "hardhat compile && hardhat test",
